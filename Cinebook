@@ -1,0 +1,879 @@
+import java.util.Scanner;
+
+public class Cinebook {
+
+    // ==========================================
+
+    // 1. GLOBAL VARIABLES AND DATA STORAGE
+
+    // ==========================================
+
+    // Scanner receives inputs from the customer.
+
+    static Scanner input = new Scanner(System.in);
+
+    // ANSI COLOR CUSTOMIZATION
+
+    static final String RESET = "\u001B[0m";
+
+    static final String RED = "\u001B[31m";
+
+    static final String GREEN = "\u001B[32m";
+
+    static final String YELLOW = "\u001B[33m";
+
+    static final String BLUE = "\u001B[34m";
+
+    static final String PURPLE = "\u001B[35m";
+
+    static final String CYAN = "\u001B[36m";
+
+    static final String WHITE = "\u001B[37m";
+
+    static final String BOLD = "\u001B[1m";
+
+    static final String UNDERLINE = "\u001B[4m";
+
+    // 1D ARRAY: Stores available movie titles.
+
+    static String[] movies = {
+
+        "Wicked: For Good", 
+
+        "Rewind",
+
+        "The Hows of Us",
+
+        "Coco"
+
+    };
+
+    // 1D ARRAY: Stores regular ticket prices.
+
+    static double[] prices = {
+
+        300.00, 280.00, 280.00, 270.00
+
+    };
+
+    // 1D ARRAY: Stores available screening schedules.
+
+    static String[] showtimes = {
+
+        "10:30 AM",
+
+        "1:00 PM",
+
+        "4:30 PM",
+
+        "7:00 PM"
+
+    };
+
+    // REAL CINEMA BRANCHES IN LIPA CITY, BATANGAS.
+    // Addresses are based on publicly listed cinema locations.
+    static String[] cinemaLocations = {
+        "SM Cinema Lipa - SM City Lipa",
+        "Robinsons Movieworld Lipa - Robinsons Place Lipa"
+    };
+
+    static String[] cinemaAddresses = {
+        "2/F SM City Lipa, Ayala Highway, Lipa City, Batangas",
+        "Robinsons Place Lipa, J.P. Laurel Highway, Mataas na Lupa, Lipa City"
+    };
+
+    // 1D ARRAY: Stores ticket categories.
+
+    static String[] ticketTypes = {
+
+        "Regular", "Student", "Senior Citizen"
+
+    };
+
+    // SAMPLE VOUCHERS: These are demo codes for the school project.
+    // A voucher can only be used once during the current program session.
+    static String[] voucherCodes = {"CINE10", "MOVIE50"};
+    static boolean[] voucherUsed = {false, false};
+
+    // 1D ARRAY: Stores available payment methods.
+
+    static String[] paymentMethods = {
+
+        "Cash", "GCash", "Credit/Debit Card"
+
+    };
+
+    // Booking reference counter.
+
+    static int bookingCounter = 1001;
+
+    // ==========================================
+
+    // 2. MAIN METHOD
+
+    // ==========================================
+
+    // ==========================================
+    // REUSABLE LOADING AND INTERFACE METHODS
+    // ==========================================
+
+    // Reads an integer safely and rejects text or other invalid input.
+    // Keeps asking until the customer enters a valid integer.
+    static int readIntInput() {
+
+        while (true) {
+
+            if (input.hasNextInt()) {
+                return input.nextInt();
+            } else {
+                System.out.println(RED + "Invalid input! Please enter a number." + RESET);
+                input.next(); // Discards the invalid input.
+                System.out.print(CYAN + "Please try again: " + RESET);
+            }
+
+        }
+
+    }
+
+    // Displays a simple animated loading bar.
+    static void loadingScreen(String message) {
+
+        System.out.println(CYAN + BOLD + "\n" + message + RESET);
+
+        for (int i = 0; i <= 20; i++) {
+
+            System.out.print("\r" + BLUE + "[" + RESET);
+
+            for (int j = 0; j < 20; j++) {
+                if (j < i) {
+                    System.out.print(GREEN + "#" + RESET);
+                } else {
+                    System.out.print(WHITE + "-" + RESET);
+                }
+            }
+
+            int percentage = i * 5;
+            System.out.print(BLUE + "] " + YELLOW + percentage + "%" + RESET);
+
+            try {
+                Thread.sleep(60);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.out.println(RED + "\nLoading was interrupted." + RESET);
+                return;
+            }
+        }
+
+        System.out.println(GREEN + BOLD + "\n" + message + " - DONE!" + RESET);
+        System.out.println();
+    }
+
+    // Displays a consistent heading for each section.
+    static void printSectionHeader(String title) {
+
+        System.out.println();
+        System.out.println(PURPLE + BOLD + "================================================" + RESET);
+        System.out.println(CYAN + BOLD + "                  " + title + RESET);
+        System.out.println(PURPLE + BOLD + "================================================" + RESET);
+
+    }
+
+    // Displays a consistent divider between information.
+    static void printDivider() {
+        System.out.println(BLUE + "------------------------------------------------" + RESET);
+    }
+
+    public static void main(String[] args) {
+
+        loadingScreen("Starting CINEBOOK");
+
+        int choice;
+
+        do {
+
+            welcomeScreen();
+
+            mainMenu();
+
+            System.out.print(CYAN + "\nEnter your choice: " + RESET);
+
+            choice = readIntInput();
+
+            switch (choice) {
+
+                case 1:
+
+                    bookTicket();
+
+                    break;
+
+                case 2:
+
+                    displayMovies();
+
+                    break;
+
+                case 3:
+
+                    cinemaInformation();
+
+                    break;
+
+                case 4:
+
+                    System.out.println(GREEN + "\nThank you for visiting CINEBOOK!");
+
+                    System.out.println("Enjoy your movie experience!" + RESET);
+
+                    break;
+
+                default:
+
+                    System.out.println(RED + "\nInvalid choice. Please try again." + RESET);
+
+            }
+
+            if (choice != 4) {
+
+                System.out.print(YELLOW + "\nPress 1 to return to Main Menu: " + RESET);
+
+                int back = readIntInput();
+
+            }
+
+        } while (choice != 4);
+
+        input.close();
+
+    }
+
+    // ==========================================
+
+    // 3. WELCOME SCREEN
+
+    // ==========================================
+
+    static void welcomeScreen() {
+
+        System.out.println();
+        System.out.println(RED + BOLD + "================================================" + RESET);
+        System.out.println(RED + BOLD + "                    CINEBOOK" + RESET);
+        System.out.println(YELLOW + BOLD + "           YOUR MOVIE. YOUR MOMENT." + RESET);
+        System.out.println(RED + BOLD + "================================================" + RESET);
+        System.out.println(GREEN + "                  SYSTEM ONLINE" + RESET);
+
+    }
+
+    // ==========================================
+    // 4. MAIN MENU
+    // ==========================================
+
+    static void mainMenu() {
+
+        printSectionHeader("MAIN MENU");
+
+        System.out.println(GREEN + "  [1] " + WHITE + "Book a Ticket" + RESET);
+        System.out.println(GREEN + "  [2] " + WHITE + "Now Showing" + RESET);
+        System.out.println(GREEN + "  [3] " + WHITE + "Cinema Information" + RESET);
+        System.out.println(RED + "  [4] " + WHITE + "Exit" + RESET);
+
+        printDivider();
+
+    }
+
+    // ==========================================
+    // 5. DISPLAY AVAILABLE MOVIES
+    // ==========================================
+
+    static void displayMovies() {
+
+        printSectionHeader("NOW SHOWING");
+
+        for (int i = 0; i < movies.length; i++) {
+
+            System.out.println(
+
+                YELLOW + "[" + (i + 1) + "] " + RESET +
+
+                WHITE + movies[i] + RESET +
+
+                GREEN + " - PHP " + prices[i] + RESET
+
+            );
+
+        }
+
+        printDivider();
+
+    }
+
+    // ==========================================
+
+    // 6. CINEMA INFORMATION
+
+    // ==========================================
+
+    static void cinemaInformation() {
+
+        printSectionHeader("CINEMA INFORMATION");
+
+        System.out.println(WHITE + "Cinema Name: " + YELLOW + "CINEBOOK" + RESET);
+
+        System.out.println(WHITE + "Location: CINEBOOK Cinema Center" + RESET);
+
+        System.out.println(WHITE + "Available Theaters: 1 - 4" + RESET);
+
+        System.out.println(WHITE + "Operating Hours: 10:00 AM - 10:00 PM" + RESET);
+
+        System.out.println(GREEN + "Ticket Booking: Available" + RESET);
+
+        printDivider();
+
+    }
+
+    // ==========================================
+
+    // 7. MAIN BOOKING PROCESS
+
+    // ==========================================
+
+    static void bookTicket() {
+
+        displayMovies();
+
+        System.out.print(CYAN + "\nSelect a movie: " + RESET);
+
+        int movieChoice = readIntInput();
+
+        if (movieChoice < 1 || movieChoice > movies.length) {
+
+            System.out.println(RED + "Invalid movie selection." + RESET);
+
+            return;
+
+        }
+
+        String selectedMovie = movies[movieChoice - 1];
+
+        double ticketPrice = prices[movieChoice - 1];
+
+        // 7.0 SELECT CINEMA LOCATION
+        printSectionHeader("SELECT CINEMA LOCATION");
+        for (int i = 0; i < cinemaLocations.length; i++) {
+            System.out.println(YELLOW + "[" + (i + 1) + "] " + RESET + cinemaLocations[i]);
+            System.out.println(WHITE + "    " + cinemaAddresses[i] + RESET);
+        }
+
+        System.out.print(CYAN + "\nSelect cinema location: " + RESET);
+        int locationChoice = readIntInput();
+
+        if (locationChoice < 1 || locationChoice > cinemaLocations.length) {
+            System.out.println(RED + "Invalid cinema location." + RESET);
+            return;
+        }
+
+        String selectedLocation = cinemaLocations[locationChoice - 1];
+        String selectedAddress = cinemaAddresses[locationChoice - 1];
+
+        // 7.0.1 SELECT AVAILABLE DATE
+        // Preset dates are used so this feature only needs String arrays.
+        printSectionHeader("AVAILABLE SCREENING DATES");
+        String[] availableDates = {
+            "November 04, 2026",
+            "November 05, 2026",
+            "November 06, 2026",
+            "November 07, 2026",
+            "November 08, 2026",
+            "November 09, 2026",
+            "November 10, 2026"
+        };
+
+        for (int i = 0; i < availableDates.length; i++) {
+            System.out.println(YELLOW + "[" + (i + 1) + "] " + RESET + availableDates[i]);
+        }
+
+        System.out.print(CYAN + "\nSelect screening date: " + RESET);
+        int dateChoice = readIntInput();
+
+        if (dateChoice < 1 || dateChoice > availableDates.length) {
+            System.out.println(RED + "Invalid date selection." + RESET);
+            return;
+        }
+
+        String selectedDate = availableDates[dateChoice - 1];
+
+        // 7.1 SELECT SCREENING SCHEDULE
+
+        printSectionHeader("AVAILABLE SHOWTIMES");
+
+        for (int i = 0; i < showtimes.length; i++) {
+
+            System.out.println(YELLOW + "[" + (i + 1) + "] " +
+
+                RESET + showtimes[i]);
+
+        }
+
+        System.out.print(CYAN + "\nSelect showtime: " + RESET);
+
+        int timeChoice = readIntInput();
+
+        if (timeChoice < 1 || timeChoice > showtimes.length) {
+
+            System.out.println(RED + "Invalid showtime selection." + RESET);
+
+            return;
+
+        }
+
+        String selectedTime = showtimes[timeChoice - 1];
+
+        // 7.2 SELECT TICKET CATEGORY
+
+        printSectionHeader("TICKET CATEGORY");
+
+        for (int i = 0; i < ticketTypes.length; i++) {
+
+            System.out.println(YELLOW + "[" + (i + 1) + "] " +
+
+                RESET + ticketTypes[i]);
+
+        }
+
+        System.out.print(CYAN + "\nSelect ticket category: " + RESET);
+
+        int typeChoice = readIntInput();
+
+        if (typeChoice < 1 || typeChoice > ticketTypes.length) {
+
+            System.out.println(RED + "Invalid ticket category." + RESET);
+
+            return;
+
+        }
+
+        String selectedType = ticketTypes[typeChoice - 1];
+
+        // 7.3 APPLY THE SELECTED TICKET DISCOUNT
+        // Student discount: 10% (existing project rule).
+        // Senior citizen discount: 20% (RA 9994), with valid OSCA ID.
+        // These discounts are not combined with voucher promotions.
+
+        String discountDescription = "No discount";
+        double regularTicketPrice = ticketPrice;
+        double discountRate = 0.00;
+
+        if (typeChoice == 2) {
+
+            discountRate = 0.10;
+            discountDescription = "Student Discount (10%)";
+
+        } else if (typeChoice == 3) {
+
+            System.out.print(CYAN + "Does the senior citizen have a valid OSCA Senior Citizen ID? (Y/N): " + RESET);
+            String idConfirmation = input.next();
+
+            if (!idConfirmation.equalsIgnoreCase("Y")) {
+                System.out.println(RED + "A valid Senior Citizen ID is required to apply the discount." + RESET);
+                return;
+            }
+
+            discountRate = 0.20;
+            discountDescription = "Senior Citizen Discount (20%)";
+
+        }
+
+        // 7.4 NUMBER OF TICKETS
+
+        System.out.print(CYAN + "\nEnter number of tickets (1-20): " + RESET);
+
+        int ticketCount = readIntInput();
+
+        if (ticketCount < 1 || ticketCount > 20) {
+
+            System.out.println(RED + "Invalid ticket quantity." + RESET);
+
+            return;
+
+        }
+
+        // 7.5 SEAT SELECTION
+
+        String[] selectedSeats = selectSeats(ticketCount);
+
+        if (selectedSeats == null) {
+
+            return;
+
+        }
+
+        // 7.6 PAYMENT CALCULATION AND VOUCHER VALIDATION
+
+        double subtotal = regularTicketPrice * ticketCount;
+        double categoryDiscount = subtotal * discountRate;
+        double voucherDiscount = 0.00;
+        double totalDiscount = categoryDiscount;
+        String appliedVoucher = "None";
+        int appliedVoucherIndex = -1;
+
+        printSectionHeader("AVAILABLE VOUCHER CODES");
+        System.out.println(GREEN + "CINE10  - 10% off your booking" + RESET);
+        System.out.println(GREEN + "MOVIE50 - PHP 50.00 off your booking" + RESET);
+        System.out.println(WHITE + "Enter SKIP if you do not have a voucher." + RESET);
+        System.out.print(CYAN + "Enter voucher code: " + RESET);
+        String enteredCode = input.next().trim().toUpperCase();
+
+        if (!enteredCode.equals("SKIP")) {
+
+            for (int i = 0; i < voucherCodes.length; i++) {
+                if (enteredCode.equals(voucherCodes[i])) {
+                    appliedVoucherIndex = i;
+                    break;
+                }
+            }
+
+            if (appliedVoucherIndex == -1) {
+                System.out.println(RED + "Invalid voucher code. No voucher discount was applied." + RESET);
+            } else if (voucherUsed[appliedVoucherIndex]) {
+                System.out.println(RED + "This voucher has already been used during this session." + RESET);
+                appliedVoucherIndex = -1;
+            } else {
+                if (appliedVoucherIndex == 0) {
+                    voucherDiscount = subtotal * 0.10;
+                } else {
+                    voucherDiscount = Math.min(50.00, subtotal);
+                }
+
+                // Only one discount may be used. Choose the greater benefit.
+                if (voucherDiscount > categoryDiscount) {
+                    totalDiscount = voucherDiscount;
+                    discountDescription = "Voucher: " + enteredCode;
+                    appliedVoucher = enteredCode;
+                    System.out.println(GREEN + "Voucher applied! It gives a better discount." + RESET);
+                } else {
+                    appliedVoucherIndex = -1;
+                    System.out.println(YELLOW + "Your ticket-category discount is equal or more valuable. It will be used instead." + RESET);
+                }
+            }
+
+        }
+
+        double totalAmount = subtotal - totalDiscount;
+
+        bookingSummary(
+            selectedMovie,
+            selectedLocation,
+            selectedAddress,
+            selectedDate,
+            selectedTime,
+            selectedType,
+            selectedSeats,
+            ticketCount,
+            regularTicketPrice,
+            subtotal,
+            discountDescription,
+            totalDiscount,
+            appliedVoucher,
+            totalAmount
+        );
+
+        // 7.7 BOOKING CONFIRMATION
+
+        System.out.println(CYAN + "\n[1] Confirm Booking" + RESET);
+
+        System.out.println(RED + "[2] Cancel Booking" + RESET);
+
+        System.out.print(YELLOW + "Enter choice: " + RESET);
+
+        int confirmation = readIntInput();
+
+        if (confirmation == 1) {
+
+            String payment = processPayment();
+
+            if (payment != null) {
+
+                generateTicket(
+                    selectedMovie,
+                    selectedLocation,
+                    selectedAddress,
+                    selectedDate,
+                    selectedTime,
+                    selectedType,
+                    selectedSeats,
+                    ticketCount,
+                    regularTicketPrice,
+                    subtotal,
+                    totalAmount,
+                    payment,
+                    discountDescription,
+                    totalDiscount,
+                    appliedVoucher
+
+                );
+
+                if (appliedVoucherIndex != -1) {
+                    voucherUsed[appliedVoucherIndex] = true;
+                }
+
+            }
+
+        } else {
+
+            System.out.println(RED + "\nBooking cancelled." + RESET);
+
+        }
+
+    }
+
+    // ==========================================
+
+    // 8. SEAT SELECTION
+
+    // ==========================================
+
+    static String[] selectSeats(int ticketCount) {
+
+        // 1D ARRAY: Stores the status of 20 cinema seats.
+        // A = Available, X = Occupied, S = Selected.
+        char[] seatStatus = new char[20];
+
+        for (int i = 0; i < seatStatus.length; i++) {
+            seatStatus[i] = 'A';
+        }
+
+        // SAMPLE DATA: Preoccupied seats for demonstration.
+        seatStatus[2] = 'X';
+        seatStatus[7] = 'X';
+        seatStatus[13] = 'X';
+
+        String[] selectedSeats = new String[ticketCount];
+
+        printSectionHeader("CINEMA SEAT SELECTION");
+        System.out.println(WHITE + "Choose your seats inside the cinema hall." + RESET);
+
+        for (int i = 0; i < ticketCount; i++) {
+
+            // Draw the cinema hall with a fixed 47-character inner width.
+            System.out.println();
+            System.out.println(PURPLE + "        #################################################" + RESET);
+            System.out.println(PURPLE + "        #" + RESET + "                                               " + PURPLE + "#" + RESET);
+            System.out.println(PURPLE + "        #" + RESET + CYAN + BOLD + "       >>>>> CINEMA VIEWING SCREEN <<<<<       " + RESET + PURPLE + "#" + RESET);
+            System.out.println(PURPLE + "        #" + RESET + "       =================================       " + PURPLE + "#" + RESET);
+            System.out.println(PURPLE + "        #" + RESET + "                                               " + PURPLE + "#" + RESET);
+            System.out.println(PURPLE + "        #" + RESET + "                 SEATING AREA                  " + PURPLE + "#" + RESET);
+            System.out.println(PURPLE + "        #" + RESET + "                                               " + PURPLE + "#" + RESET);
+
+            for (int row = 0; row < 4; row++) {
+                char rowLetter = (char) ('A' + row);
+                System.out.print(PURPLE + "        #" + RESET + WHITE + "   " + rowLetter + "  " + RESET);
+
+                for (int column = 0; column < 5; column++) {
+                    int seatIndex = (row * 5) + column;
+                    String seatLabel = "" + rowLetter + (column + 1);
+
+                    // Every seat cell occupies exactly 7 visible characters.
+                    if (seatStatus[seatIndex] == 'A') {
+                        System.out.print(GREEN + "[" + seatLabel + "]   " + RESET);
+                    } else if (seatStatus[seatIndex] == 'X') {
+                        System.out.print(RED + "[ XX ] " + RESET);
+                    } else {
+                        System.out.print(YELLOW + "[" + seatLabel + "]   " + RESET);
+                    }
+                }
+
+                // 6 spaces complete the 47-character inner area.
+                System.out.println("      " + PURPLE + "#" + RESET);
+                System.out.println(PURPLE + "        #" + RESET + "                                               " + PURPLE + "#" + RESET);
+            }
+
+            System.out.println(PURPLE + "        #" + RESET + "                                               " + PURPLE + "#" + RESET);
+            System.out.println(PURPLE + "        #################################################" + RESET);
+            System.out.println();
+            System.out.println(GREEN + "[A1]" + RESET + " Available    " +
+                               RED + "[ XX ]" + RESET + " Occupied    " +
+                               YELLOW + "[A1]" + RESET + " Selected");
+            System.out.println(WHITE + "Seat numbering: A1-A5 = 1-5, B1-B5 = 6-10, C1-C5 = 11-15, D1-D5 = 16-20." + RESET);
+
+            System.out.print(CYAN + "\nSelect seat number (1-20) for ticket " + (i + 1) + ": " + RESET);
+            int seatNumber = readIntInput();
+
+            if (seatNumber < 1 || seatNumber > 20) {
+                System.out.println(RED + "Invalid seat number. Please choose from 1 to 20." + RESET);
+                i--;
+                continue;
+            }
+
+            int seatIndex = seatNumber - 1;
+
+            if (seatStatus[seatIndex] == 'X') {
+                System.out.println(RED + "Sorry! This seat is occupied. Please choose another seat." + RESET);
+                i--;
+                continue;
+            }
+
+            if (seatStatus[seatIndex] == 'S') {
+                System.out.println(YELLOW + "You already selected this seat. Please choose another one." + RESET);
+                i--;
+                continue;
+            }
+
+            seatStatus[seatIndex] = 'S';
+            char row = (char) ('A' + (seatIndex / 5));
+            int column = (seatIndex % 5) + 1;
+            selectedSeats[i] = row + "" + column;
+
+            System.out.println(GREEN + BOLD + "Seat " + selectedSeats[i] + " selected successfully!" + RESET);
+        }
+
+        System.out.println(GREEN + BOLD + "\nAll seats successfully selected!" + RESET);
+        return selectedSeats;
+    }
+
+    static void bookingSummary(
+        String movie,
+        String location,
+        String address,
+        String screeningDate,
+        String time,
+        String category,
+        String[] seats,
+        int quantity,
+        double price,
+        double subtotal,
+        String discountDescription,
+        double discountAmount,
+        String voucherCode,
+        double total
+    ) {
+        printSectionHeader("BOOKING SUMMARY");
+        System.out.println(WHITE + "Movie: " + YELLOW + movie + RESET);
+        System.out.println(WHITE + "Cinema: " + YELLOW + location + RESET);
+        System.out.println(WHITE + "Address: " + YELLOW + address + RESET);
+        System.out.println(WHITE + "Screening Date: " + YELLOW + screeningDate + RESET);
+        System.out.println(WHITE + "Showtime: " + YELLOW + time + RESET);
+        System.out.println(WHITE + "Ticket Category: " + YELLOW + category + RESET);
+        System.out.println(WHITE + "Number of Tickets: " + YELLOW + quantity + RESET);
+
+        System.out.print(WHITE + "Selected Seats: " + GREEN);
+        for (int i = 0; i < seats.length; i++) {
+            System.out.print(seats[i]);
+            if (i < seats.length - 1) System.out.print(", ");
+        }
+
+        System.out.printf(RESET + "\nPrice per Ticket: PHP %.2f", price);
+        System.out.printf("\nSubtotal: PHP %.2f", subtotal);
+        System.out.println("\nDiscount Applied: " + discountDescription);
+        System.out.printf("Total Discount: PHP %.2f", discountAmount);
+        System.out.println("\nVoucher Code: " + voucherCode);
+        System.out.printf(YELLOW + BOLD + "\nTotal Amount: PHP %.2f\n" + RESET, total);
+        printDivider();
+    }
+
+    // ==========================================
+
+    // 10. PAYMENT PROCESS
+
+    // ==========================================
+
+    static String processPayment() {
+
+        printSectionHeader("PAYMENT METHOD");
+
+        for (int i = 0; i < paymentMethods.length; i++) {
+
+            System.out.println(BLUE + "[" + (i + 1) + "] " +
+
+                RESET + paymentMethods[i]);
+
+        }
+
+        System.out.print(CYAN + "\nSelect payment method: " + RESET);
+
+        int paymentChoice = readIntInput();
+
+        if (paymentChoice < 1 || paymentChoice > paymentMethods.length) {
+
+            System.out.println(RED + "Invalid payment method." + RESET);
+
+            return null;
+
+        }
+
+        String selectedPayment = paymentMethods[paymentChoice - 1];
+
+        loadingScreen("Processing payment");
+
+        System.out.println(GREEN + BOLD + "Payment successful!" + RESET);
+
+        return selectedPayment;
+
+    }
+
+    // ==========================================
+
+    // 11. GENERATE CINEMA TICKET
+
+    // ==========================================
+
+    static void generateTicket(
+        String movie,
+        String location,
+        String address,
+        String screeningDate,
+        String time,
+        String category,
+        String[] seats,
+        int quantity,
+        double price,
+        double subtotal,
+        double total,
+        String payment,
+        String discountDescription,
+        double discountAmount,
+        String voucherCode
+    ) {
+        String reference = "CB" + bookingCounter;
+        bookingCounter++;
+
+        String border = "============================================================";
+        System.out.println("\n" + PURPLE + BOLD + border + RESET);
+        System.out.println(CYAN + BOLD + "                    C I N E B O O K" + RESET);
+        System.out.println(YELLOW + BOLD + "                 OFFICIAL BOOKING RECEIPT" + RESET);
+        System.out.println(PURPLE + BOLD + border + RESET);
+
+        System.out.println(WHITE + "Booking Reference : " + YELLOW + reference + RESET);
+        System.out.println(WHITE + "Movie             : " + YELLOW + movie + RESET);
+        System.out.println(WHITE + "Cinema            : " + YELLOW + location + RESET);
+        System.out.println(WHITE + "Address           : " + YELLOW + address + RESET);
+        System.out.println(WHITE + "Screening Date    : " + YELLOW + screeningDate + RESET);
+        System.out.println(WHITE + "Showtime          : " + YELLOW + time + RESET);
+        System.out.println(WHITE + "Ticket Category   : " + YELLOW + category + RESET);
+        System.out.println(WHITE + "Number of Tickets : " + YELLOW + quantity + RESET);
+
+        System.out.print(WHITE + "Seat Number(s)    : " + GREEN);
+        for (int i = 0; i < seats.length; i++) {
+            System.out.print(seats[i]);
+            if (i < seats.length - 1) System.out.print(", ");
+        }
+        System.out.println(RESET);
+
+        System.out.println(PURPLE + "---------------------- PAYMENT DETAILS ---------------------" + RESET);
+        System.out.printf(WHITE + "Price per Ticket  : PHP %.2f\n", price);
+        System.out.printf("Subtotal          : PHP %.2f\n", subtotal);
+        System.out.println("Discount Applied  : " + discountDescription);
+        System.out.printf("Discount Amount   : PHP %.2f\n", discountAmount);
+        System.out.println("Voucher Code      : " + voucherCode);
+        System.out.printf(GREEN + BOLD + "TOTAL PAID        : PHP %.2f\n" + RESET, total);
+        System.out.println(WHITE + "Payment Method    : " + GREEN + payment + RESET);
+
+        System.out.println(PURPLE + BOLD + border + RESET);
+        System.out.println(GREEN + BOLD + "                 PLEASE KEEP THIS RECEIPT" + RESET);
+        System.out.println(CYAN + "                    ENJOY YOUR MOVIE!" + RESET);
+        System.out.println(PURPLE + BOLD + border + RESET);
+        System.out.println(WHITE + "Note: This is a school-project booking receipt." + RESET);
+    }
+
+}
+
+
